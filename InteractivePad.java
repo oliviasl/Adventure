@@ -24,7 +24,7 @@ public class InteractivePad extends Item{
     public void changeColor(){
         if( b == 126 ){
             increment = -2;
-        } else if ( b == 30 ){
+        } else if ( b == 16 ){
             increment = 2;
         }
         b += increment;

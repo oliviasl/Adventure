@@ -9,7 +9,7 @@ public class Portal extends Item{
 
 
     public Portal(int x, int y){
-        super(x,y,250,230);
+        super(x,y,250,220);
 
         portal = new ImageIcon("ImageAssets/Portal.png");
     }

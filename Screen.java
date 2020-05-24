@@ -10,6 +10,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import javax.swing.ImageIcon;
 
+import java.net.URL;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.Clip;
+
 
 public class Screen extends JPanel implements KeyListener, ActionListener {
 
@@ -27,6 +31,7 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 
 	private boolean narrationGo, villagersFound, interactivePadGo;
 	private boolean monsterGo, fadeGo, goblinGo, portalGo, fadeOutGo;
+	private boolean showObjective;
 
 	private ArrayList<Item> groundItems, inventoryItems;
 	private ArrayList<Villager> villagerList;
@@ -38,7 +43,7 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 	private Altar altar;
 	private Portal portal;
 
-	private JButton startButton;
+	private JButton startButton, returnStartButton, controlsButton, backButton;
 
 	private Color groundGreen, groundBrown, rockGray, lakeBlue;
 
@@ -56,6 +61,11 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 	private ImageIcon background;
 	private ImageIcon waterDragon, waterSplash;
 	private ImageIcon goblin, magicOrb;
+	private ImageIcon title, endTitle;
+	private ImageIcon controls, controls2, controlsTitle;
+	private ImageIcon objective1, objective2, objective3, objective4;
+	private ImageIcon objective5, objective6, objective7, objective8;
+	private ImageIcon currentObjective;
 
 
 	public Screen(){
@@ -67,11 +77,11 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 		gameLevel = 0;
 		walk = 1;
 		directionFacing = 1; //1 for right, 2 for left
-		narrationSequence = 1;
+		narrationSequence = 0;
 		monsterTiming = 1;
-		fadeVar = 1;
+		fadeVar = 255;
 		fadeIncrement = 2;
-		fadeSequence = 1;
+		fadeSequence = 0;
 		narrationGo = true;
 		villagersFound = false;
 		interactivePadGo = false;
@@ -80,6 +90,7 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 		goblinGo = false;
 		portalGo = false;
 		fadeOutGo = false;
+		showObjective = false;
 
 		//Colors
 		groundGreen = new Color(75,189,75);
@@ -92,7 +103,7 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 		//ground items
 		groundItems = new ArrayList<Item>();
 		groundItems.add(new Scroll(485,250));
-		groundItems.add(new Sword(1250,200));
+		groundItems.add(new Sword(1245,200));
 		groundItems.add(new MagicOrb(1225,250));
 
 		//inventory
@@ -148,6 +159,33 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 		forestList.add(new Tree(640,140));
 		forestList.add(new Tree(250,450));
 
+		//out of bounds trees 41-67
+		x = -300;
+		y = -275;
+		for(int i = 0;i < 10;i ++){
+			treeList.add(new Tree(x,y));
+			x += 250;
+		}
+		y = 1300;
+		x = 700;
+		for(int i = 0;i < 6;i ++){
+			treeList.add(new Tree(x,y));
+			x += 250;
+		}
+		y = -75;
+		for(int i = 0;i < 4;i ++){
+			treeList.add(new Tree(-300,y));
+			y += 200;
+		}
+		y = -75;
+		for(int i = 0;i < 7;i ++){
+			treeList.add(new Tree(1950,y));
+			y += 200;
+		}
+
+
+
+
 		//rock lake barrier
 		rockList = new ArrayList<Rock>();
 		x = -30;
@@ -186,12 +224,30 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 		//Portal
 		portal = new Portal(200,-100);
 
-		//JButton
-		startButton = new JButton("START");
+		//JButtons
+		startButton = new JButton("BEGIN");
 		startButton.setBounds(350,350,100,40);
 		startButton.addActionListener(this);
 		startButton.setVisible(true);
 		add(startButton);
+
+		controlsButton = new JButton("CONTROLS");
+		controlsButton.setBounds(350,410,100,40);
+		controlsButton.addActionListener(this);
+		controlsButton.setVisible(true);
+		add(controlsButton);
+
+		backButton = new JButton("BACK");
+		backButton.setBounds(20,20,80,40);
+		backButton.addActionListener(this);
+		backButton.setVisible(false);
+		add(backButton);
+
+		returnStartButton = new JButton("RETURN TO START");
+		returnStartButton.setBounds(300,350,200,40);
+		returnStartButton.addActionListener(this);
+		returnStartButton.setVisible(false);
+		add(returnStartButton);
 
 
 		//narration images
@@ -227,12 +283,28 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 		quest2Narration6 = new ImageIcon("NarrationAssets/Quest2Narration6.png");
 		quest2Narration7 = new ImageIcon("NarrationAssets/Quest2Narration7.png");
 
+		//objectives
+		objective1 = new ImageIcon("ObjectiveAssets/Objective1.png");
+		objective2 = new ImageIcon("ObjectiveAssets/Objective2.png");
+		objective3 = new ImageIcon("ObjectiveAssets/Objective3.png");
+		objective4 = new ImageIcon("ObjectiveAssets/Objective4.png");
+		objective5 = new ImageIcon("ObjectiveAssets/Objective5.png");
+		objective6 = new ImageIcon("ObjectiveAssets/Objective6.png");
+		objective7 = new ImageIcon("ObjectiveAssets/Objective7.png");
+		objective8 = new ImageIcon("ObjectiveAssets/Objective8.png");
+		currentObjective = objective1;
+
 		//other images
 		background = new ImageIcon("ImageAssets/Background.png");
 		waterDragon = new ImageIcon("ImageAssets/WaterDragon.png");
 		waterSplash = new ImageIcon("ImageAssets/WaterSplash.png");
 		goblin = new ImageIcon("ImageAssets/Goblin.png");
 		magicOrb = new ImageIcon("ImageAssets/MagicOrb.png");
+		title = new ImageIcon("ImageAssets/Title.png");
+		endTitle = new ImageIcon("ImageAssets/EndTitle.png");
+		controls = new ImageIcon("ImageAssets/Controls.png");
+		controls2 = new ImageIcon("ImageAssets/Controls2.png");
+		controlsTitle = new ImageIcon("ImageAssets/ControlsTitle.png");
 
 
 		//sets keylistener
@@ -251,19 +323,15 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 
 		if( gameLevel == 0 ){
 			g.setColor(Color.BLACK);
-			g.drawString("AdventureGame",350,275);
-		} else {
+			g.fillRect(0,0,800,600);
+			title.paintIcon(null,g,75,175);
+		} else if ( gameLevel >= 1 && gameLevel <= 3 ){
 			//ground
 			background.paintIcon(null,g,-400+xDiff,-400+yDiff);
 			g.setColor(groundBrown);
 			g.fillOval(1050+xDiff,800+yDiff,625,450);
 			g.fillOval(825+xDiff,890+yDiff,875,390);
 			g.fillRect(1400+xDiff,1000+yDiff,250,280);
-
-
-			//bounds box
-			g.setColor(Color.BLACK);
-			g.drawRect(xDiff,yDiff,1600,1200);
 
 
 			//top tree bound
@@ -363,6 +431,12 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 				treeList.get(i).drawMe(g,xDiff,yDiff);
 			}
 
+			//out of bounds trees
+			for(int i = 41;i < 68;i ++){
+				treeList.get(i).drawMe(g,xDiff,yDiff);
+			}
+
+
 
 			//Draw inventory;
 			int x = 0;
@@ -377,18 +451,46 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 			showNarration(g);
 
 
+			//quest number
+			g.setColor(Color.black);
+			if( gameLevel == 1 ){
+				g.drawString("Quest: 0",725,20);
+			} else if ( gameLevel == 2 ){
+				g.drawString("Quest: 1",725,20);
+			} else if ( gameLevel == 3 ){
+				g.drawString("Quest: 2",725,20);
+			}
+
+
+			//show objective
+			if( showObjective ){
+				currentObjective.paintIcon(null,g,225,212);
+			}
+
+
 			//fade
 			if( fadeGo ){
 				g.setColor(new Color(0,0,0,fadeVar));
 				g.fillRect(0,0,800,600);
 			}
 
-			//fade out
-			if( fadeOutGo ){
-				g.setColor(new Color(255,255,255,fadeVar));
-				g.fillRect(0,0,800,600);
-			}
+		} else if ( gameLevel == 4 ){
+			g.setColor(Color.black);
+			g.fillRect(0,0,800,600);
+			endTitle.paintIcon(null,g,150,150);
+		} else if ( gameLevel == -1 ){
+			g.setColor(Color.black);
+			g.fillRect(0,0,800,600);
+			controls.paintIcon(null,g,50,200);
+			controls2.paintIcon(null,g,50,403);
+			controlsTitle.paintIcon(null,g,150,65);
+			interactivePad.drawMe(g,xDiff,yDiff);
+		}
 
+		//fade out
+		if( fadeOutGo ){
+			g.setColor(new Color(255,255,255,fadeVar));
+			g.fillRect(0,0,800,600);
 		}
 	}
 
@@ -397,7 +499,18 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 	public void keyPressed(KeyEvent e) {
 
 		//Movement of player
-		if( gameLevel != 0 ){
+		if( gameLevel >= 1 && gameLevel <= 3 ){
+
+			//show objective
+			if( e.getKeyCode() == 81 ){ //q
+				if( showObjective ){
+					showObjective = false;
+				} else {
+					showObjective = true;
+				}
+			}
+
+
 			//check if touching rock barrier
 			boolean rockBarrier = false;
 			for(int i = 0;i < rockList.size();i ++){
@@ -472,6 +585,9 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 							interactivePadGo = true;
 							narrationGo = false;
 							break;
+						case 4:
+							playSound("Splash");
+							break;
 						case 8:
 							narrationGo = false;
 							break;
@@ -512,84 +628,158 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 					narrationSequence ++;
 				}
 			}
-		}
 
-		//Check collision between player and groundItems
-		for(int i = 0;i < groundItems.size();i ++){
-			if( p1.checkCollision(groundItems.get(i),xDiff,yDiff) ){
-				if( groundItems.get(i).getType().equals("scroll") ){
-					narrationGo = true;
-					inventoryItems.add(groundItems.get(i));
-					groundItems.remove(i);
-					i --;
-				} else if ( groundItems.get(i).getType().equals("sword") && gameLevel == 2 ){
-					narrationGo = true;
-					inventoryItems.add(groundItems.get(i));
-					groundItems.remove(i);
-					i --;
-				} else if ( groundItems.get(i).getType().equals("magicorb") && gameLevel == 3 && narrationSequence > 4 ){
-					narrationGo = true;
-					inventoryItems.add(groundItems.get(i));
-					groundItems.remove(i);
+
+			//cheat key
+			if( e.getKeyCode() == 80 && !fadeGo && !fadeOutGo ){ //p
+				if( gameLevel == 1 ){ //pass quest 0
+					//remove scroll
+					for(int i = 0;i < groundItems.size();i ++){
+						if( groundItems.get(i).getType().equals("scroll") ){
+							groundItems.remove(i);
+							i --;
+						}
+					}
+					for(int i = 0;i < inventoryItems.size();i ++){
+						if( inventoryItems.get(i).getType().equals("scroll") ){
+							inventoryItems.remove(i);
+							i --;
+						}
+					}
+
+					//set sword
+					for(int i = 0;i < groundItems.size();i ++){
+						if( groundItems.get(i).getType().equals("sword") ){
+							groundItems.get(i).setGameLevel(2);
+						}
+					}
+
+					//reset narration sequence
+					narrationGo = false;
+					gameLevel = 2;
+					narrationSequence = 1;
+					currentObjective = objective3;
+				} else if ( gameLevel == 2 ){ //pass quest 1
+					//add sword to inventory
+					for(int i = 0;i < groundItems.size();i ++){
+						if( groundItems.get(i).getType().equals("sword") ){
+							groundItems.remove(i);
+							i --;
+						}
+					}
+					for(int i = 0;i < inventoryItems.size();i ++){
+						inventoryItems.remove(i);
+						i --;
+					}
+					inventoryItems.add(new Sword(1250,200));
+					inventoryItems.get(0).setGameLevel(3);
+
+					//set magicOrb and interactivePad
+					for(int i = 0;i < groundItems.size();i ++){
+						if( groundItems.get(i).getType().equals("magicorb") ){
+							groundItems.get(i).setGameLevel(3);
+						}
+					}
+
+					//reset narration sequence
+					narrationGo = false;
+					gameLevel = 3;
+					narrationSequence = 1;
+					interactivePad.setX(1150);
+					interactivePad.setY(370);
+					interactivePadGo = true;
+					monsterGo = false;
+					goblinGo = true;
+					currentObjective = objective6;
+				} else if ( gameLevel == 3 ){ //pass quest 2
+					gameLevel = 4;
+					returnStartButton.setVisible(true);
 				}
 			}
-		}
 
-		//Check screen collision
-		if( gameLevel == 1 && !villagersFound ){
-			for(int i = 0;i < villagerList.size();i ++){
-				if( checkScreenCollision(villagerList.get(i)) ){
-					narrationGo = true;
-					villagersFound = true;
+			//Check collision between player and groundItems
+			for(int i = 0;i < groundItems.size();i ++){
+				if( p1.checkCollision(groundItems.get(i),xDiff,yDiff) ){
+					if( groundItems.get(i).getType().equals("scroll") ){
+						narrationGo = true;
+						inventoryItems.add(groundItems.get(i));
+						groundItems.remove(i);
+						i --;
+						playSound("Item");
+					} else if ( groundItems.get(i).getType().equals("sword") && gameLevel == 2 ){
+						narrationGo = true;
+						inventoryItems.add(groundItems.get(i));
+						groundItems.remove(i);
+						i --;
+						playSound("Item");
+					} else if ( groundItems.get(i).getType().equals("magicorb") && gameLevel == 3 && narrationSequence > 4 ){
+						narrationGo = true;
+						inventoryItems.add(groundItems.get(i));
+						groundItems.remove(i);
+						playSound("Item");
+					}
 				}
 			}
-		}
 
-		//Check collision between player and villagers
-		if( gameLevel == 1 ){
-			for(int i = 0;i < villagerList.size();i ++){
-				if( p1.checkCollision(villagerList.get(i),xDiff,yDiff) ){
+
+			//Check screen collision
+			if( gameLevel == 1 && !villagersFound && narrationSequence == 6){
+				for(int i = 0;i < villagerList.size();i ++){
+					if( checkScreenCollision(villagerList.get(i)) ){
+						narrationGo = true;
+						villagersFound = true;
+					}
+				}
+			}
+
+			//Check collision between player and villagers
+			if( gameLevel == 1 && villagersFound){
+				for(int i = 0;i < villagerList.size();i ++){
+					if( p1.checkCollision(villagerList.get(i),xDiff,yDiff) ){
+						narrationGo = true;
+					}
+				}
+			} else if ( gameLevel == 2  && monsterGo && narrationSequence == 9 ){
+				for(int i = 0;i < villagerList.size();i ++){
+					if( p1.checkCollision(villagerList.get(i),xDiff,yDiff) ){
+						narrationGo = true;
+					}
+				}
+			}
+
+			//Check collision between player and interactivePad
+			if( gameLevel == 2 && interactivePadGo ){
+				if( p1.checkCollision(interactivePad,xDiff,yDiff) ){
+					narrationGo = true;
+					monsterGo = true;
+				}
+			} else if ( gameLevel == 3 && interactivePadGo ){
+				if( p1.checkCollision(interactivePad,xDiff,yDiff) ){
 					narrationGo = true;
 				}
 			}
-		} else if ( gameLevel == 2  && monsterGo && narrationSequence == 9 ){
-			for(int i = 0;i < villagerList.size();i ++){
-				if( p1.checkCollision(villagerList.get(i),xDiff,yDiff) ){
-					narrationGo = true;
+
+			//Check collision between player and altar
+			if( inventoryItems.size() > 0 ){
+				if( inventoryItems.get(0).getType().equals("magicorb") ){
+					if( p1.checkCollision(altar,xDiff,yDiff) ){
+						narrationGo = true;
+						groundItems.add(inventoryItems.get(0));
+						inventoryItems.remove(0);
+						groundItems.get(0).setX(128);
+						groundItems.get(0).setY(55);
+						fadeGo = true;
+					}
 				}
 			}
-		}
 
-		//Check collision between player and interactivePad
-		if( gameLevel == 2 && interactivePadGo ){
-			if( p1.checkCollision(interactivePad,xDiff,yDiff) ){
-				narrationGo = true;
-				monsterGo = true;
-			}
-		} else if ( gameLevel == 3 && interactivePadGo ){
-			if( p1.checkCollision(interactivePad,xDiff,yDiff) ){
-				narrationGo = true;
+
+			//Check collision between player and portal;
+			if( portalGo && p1.checkCollision(portal,xDiff,yDiff) ){
+				fadeOutGo = true;
 			}
 		}
 
-		//Check collision between player and altar
-		if( inventoryItems.size() > 0 ){
-			if( inventoryItems.get(0).getType().equals("magicorb") ){
-				if( p1.checkCollision(altar,xDiff,yDiff) ){
-					narrationGo = true;
-					groundItems.add(inventoryItems.get(0));
-					inventoryItems.remove(0);
-					groundItems.get(0).setX(128);
-					groundItems.get(0).setY(55);
-					fadeGo = true;
-				}
-			}
-		}
-
-		//Check collision between player and portal;
-		if( portalGo && p1.checkCollision(portal,xDiff,yDiff) ){
-			fadeOutGo = true;
-		}
 
 		repaint();
 	}
@@ -603,6 +793,70 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
     	if( e.getSource() == startButton ){
 			gameLevel = 1;
 			startButton.setVisible(false);
+			controlsButton.setVisible(false);
+			fadeGo = true;
+		} else if ( e.getSource() == controlsButton ){
+			gameLevel = -1;
+			startButton.setVisible(false);
+			controlsButton.setVisible(false);
+			backButton.setVisible(true);
+			interactivePadGo = true;
+			interactivePad.setX(362);
+			interactivePad.setY(447);
+		} else if ( e.getSource() == backButton ){
+			startButton.setVisible(true);
+			controlsButton.setVisible(true);
+			backButton.setVisible(false);
+			gameLevel = 0;
+			interactivePad.setX(300);
+			interactivePad.setY(900);
+			interactivePadGo = false;
+		} else if ( e.getSource() == returnStartButton ){
+			gameLevel = 0;
+			startButton.setVisible(true);
+			controlsButton.setVisible(true);
+			returnStartButton.setVisible(false);
+
+			//reset all variables
+			//sets up the instance variables
+			p1 = new Player(350,270);
+			xDiff = 0;
+			yDiff = 0;
+			gameLevel = 0;
+			walk = 1;
+			directionFacing = 1; //1 for right, 2 for left
+			narrationSequence = 0;
+			monsterTiming = 1;
+			fadeVar = 255;
+			fadeIncrement = 2;
+			fadeSequence = 0;
+			narrationGo = true;
+			villagersFound = false;
+			interactivePadGo = false;
+			monsterGo = false;
+			fadeGo = false;
+			goblinGo = false;
+			portalGo = false;
+			fadeOutGo = false;
+			showObjective = false;
+			currentObjective = objective1;
+
+			//reset items
+			for(int i = 0;i < groundItems.size();i ++){
+				groundItems.remove(i);
+				i --;
+			}
+			groundItems.add(new Scroll(485,250));
+			groundItems.add(new Sword(1245,200));
+			groundItems.add(new MagicOrb(1225,250));
+			for(int i = 0;i < inventoryItems.size();i ++){
+				inventoryItems.remove(i);
+				i --;
+			}
+
+			//reset interactivePad
+			interactivePad.setX(300);
+			interactivePad.setY(900);
 		}
 
 
@@ -646,6 +900,7 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 					break;
 				case 5:
 					openingNarration5.paintIcon(null,g,225,237);
+					currentObjective = objective2;
 					break;
 				case 6:
 					openingNarration6.paintIcon(null,g,225,237);
@@ -676,6 +931,7 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 							groundItems.get(i).setGameLevel(2);
 						}
 					}
+					currentObjective = objective3;
 					break;
 				default:
 					break;
@@ -687,6 +943,7 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 					break;
 				case 2:
 					quest1Narration2.paintIcon(null,g,225,237);
+					currentObjective = objective4;
 					break;
 				case 3:
 					waterDragon.paintIcon(null,g,50+xDiff,800+yDiff);
@@ -708,6 +965,7 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 					break;
 				case 8:
 					quest1Narration6.paintIcon(null,g,225,237);
+					currentObjective = objective5;
 					break;
 				case 9:
 					quest1Narration7.paintIcon(null,g,690+xDiff,800+yDiff);
@@ -732,6 +990,7 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 							groundItems.get(i).setGameLevel(3);
 						}
 					}
+					currentObjective = objective6;
 					break;
 				default:
 					break;
@@ -756,9 +1015,11 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 					break;
 				case 7:
 					quest2Narration6.paintIcon(null,g,225,237);
+					currentObjective = objective7;
 					break;
 				case 9:
 					quest2Narration7.paintIcon(null,g,225,237);
+					currentObjective = objective8;
 				default:
 					break;
 			}
@@ -781,6 +1042,9 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 				if( monsterTiming == 100 ){
 					narrationSequence ++;
 					monsterTiming = 0;
+					if( narrationSequence == 7 ){
+						playSound("Victory");
+					}
 				} else {
 					monsterTiming ++;
 				}
@@ -793,6 +1057,7 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 					fadeIncrement = -2;
 					if( fadeSequence == 1 ){
 						goblinGo = false;
+						playSound("Walk");
 						for(int i = 0;i < inventoryItems.size();i ++){
 							if ( inventoryItems.get(i).getType().equals("sword") ){
 								inventoryItems.remove(i);
@@ -818,9 +1083,17 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 			if( fadeOutGo ){
 				if( fadeVar >= 255 ){
 					gameLevel = 4;
-				} else {
-					fadeVar ++;
+					returnStartButton.setVisible(true);
+					fadeIncrement = -2;
+					playSound("portal");
 				}
+				fadeVar += fadeIncrement;
+				if( fadeVar <= 0 ){
+					fadeOutGo = false;
+					fadeIncrement = 2;
+					fadeVar = 1;
+				}
+
 			}
 
 			//slow it down and repaint
@@ -834,5 +1107,19 @@ public class Screen extends JPanel implements KeyListener, ActionListener {
 
 		}
 	}
+
+
+	//sounds
+	public void playSound(String filepath) {
+
+	   try {
+		   URL url = this.getClass().getClassLoader().getResource("SoundAssets/" + filepath + ".wav");
+		   Clip clip = AudioSystem.getClip();
+		   clip.open(AudioSystem.getAudioInputStream(url));
+		   clip.start();
+	   } catch (Exception exc) {
+		   exc.printStackTrace(System.out);
+	   }
+   }
 
 }

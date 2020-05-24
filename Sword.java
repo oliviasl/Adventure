@@ -22,7 +22,6 @@ public class Sword extends Item {
         } else if ( getGameLevel() == 3 ){
             swordForGoblin.paintIcon(null,g,getX()+xDiff,getY()+yDiff);
         }
-
     }
 
     @Override

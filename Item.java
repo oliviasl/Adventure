@@ -31,20 +31,20 @@ public class Item {
 	}
 
 	public int getX(){
-		return x;
+		return x+10;
 	}
 
 	public int getY(){
-		return y;
+		return y+10;
 	}
 
 
 	public int getWidth(){
-		return width;
+		return width-20;
 	}
 
 	public int getHeight(){
-		return height;
+		return height-20;
 	}
 
 	public String getType(){
